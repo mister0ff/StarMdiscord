@@ -9,7 +9,7 @@
             --primary: #6366f1;
             --primary-hover: #4f46e5;
             --bg: #0f172a;
-            --surface: rgba(30, 41, 59, 0.90);
+            --surface: rgba(30, 41, 59, 0.95);
             --surface-hover: #334155;
             --text: #f8fafc;
             --text-muted: #94a3b8;
@@ -28,7 +28,7 @@
             overflow: hidden;
             box-sizing: border-box;
             user-select: none;
-            touch-action: none;
+            -webkit-user-select: none;
         }
 
         /* HUD Superior Flutuante */
@@ -59,18 +59,18 @@
 
         .top-hud h1 {
             margin: 0;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
         }
 
         #status {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
         }
 
         .toolbar {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             margin-top: 4px;
             flex-wrap: wrap;
             justify-content: center;
@@ -80,29 +80,20 @@
             background-color: var(--surface-hover);
             color: var(--text);
             border: 1px solid var(--border);
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 5px;
-            transition: all 0.2s ease;
+            gap: 4px;
             outline: none;
-        }
-
-        .btn-action:hover {
-            border-color: var(--text-muted);
         }
 
         .btn-primary {
             background-color: var(--primary);
             border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
         }
 
         .btn-edit-mode.active-mode {
@@ -123,7 +114,7 @@
             pointer-events: none;
         }
 
-        /* Botão Personalizado com Multi-toque */
+        /* Botão Personalizado */
         .btn-custom {
             position: absolute;
             pointer-events: auto;
@@ -136,21 +127,20 @@
             outline: none;
             -webkit-tap-highlight-color: transparent;
             image-rendering: pixelated;
-            image-rendering: crisp-edges;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             color: #ffffff;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             text-shadow: 2px 2px 0px #000000;
         }
 
         .container.editing .btn-custom {
             cursor: move;
-            border: 1px dashed rgba(255, 255, 255, 0.6);
+            border: 1px dashed rgba(255, 255, 255, 0.8);
         }
 
         .btn-custom.active {
@@ -159,12 +149,12 @@
 
         .key-badge {
             position: absolute;
-            bottom: -6px;
-            right: -6px;
+            bottom: -4px;
+            right: -4px;
             background: var(--primary);
             color: white;
-            font-size: 10px;
-            padding: 2px 6px;
+            font-size: 9px;
+            padding: 2px 5px;
             border-radius: 4px;
             font-weight: 700;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -175,22 +165,21 @@
             position: absolute;
             bottom: 2px;
             right: 2px;
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             background-color: #38bdf8;
             border: 2px solid #ffffff;
             border-radius: 50%;
             cursor: nwse-resize;
             display: none;
             z-index: 10;
-            touch-action: none;
         }
 
         .container.editing .resize-handle {
             display: block;
         }
 
-        /* Ícone Redondo Flutuante (Bolha de Acesso Rápido) */
+        /* Ícone Redondo Flutuante */
         .floating-bubble {
             position: fixed;
             top: 80px;
@@ -207,15 +196,12 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             cursor: pointer;
             z-index: 999;
-            touch-action: none;
             border: 2px solid rgba(255,255,255,0.3);
             pointer-events: auto;
-        }
-        .floating-bubble:active {
-            transform: scale(0.95);
+            touch-action: none;
         }
 
-        /* Área de Teste Flutuante Inferior */
+        /* Área de Teste Inferior */
         .test-area {
             position: fixed;
             bottom: 15px;
@@ -224,7 +210,7 @@
             z-index: 100;
             background: var(--surface);
             backdrop-filter: blur(8px);
-            padding: 12px 18px;
+            padding: 10px 15px;
             border-radius: 14px;
             border: 1px solid var(--border);
             display: flex;
@@ -243,36 +229,35 @@
         }
 
         .test-area label {
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             align-self: flex-start;
         }
 
         .test-area textarea {
             width: 100%;
-            height: 50px;
-            padding: 8px;
+            height: 45px;
+            padding: 6px;
             border-radius: 8px;
             border: 1px solid var(--border);
             background: var(--bg);
             color: var(--text);
             resize: none;
-            font-size: 13px;
+            font-size: 12px;
             box-sizing: border-box;
             outline: none;
         }
 
-        /* Modal Geral */
+        /* Modais */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(4px);
+            background: rgba(15, 23, 42, 0.85);
             display: none;
             justify-content: center;
             align-items: center;
@@ -282,24 +267,24 @@
 
         .modal {
             background: #1e293b;
-            padding: 24px;
-            border-radius: 18px;
+            padding: 20px;
+            border-radius: 16px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
             width: 90%;
-            max-width: 420px;
+            max-width: 380px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
             border: 1px solid var(--border);
         }
 
         .modal h3 {
             margin: 0;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .modal label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-muted);
             display: block;
@@ -315,63 +300,56 @@
             color: var(--text);
             box-sizing: border-box;
             outline: none;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .modal-buttons {
             display: flex;
             justify-content: flex-end;
             gap: 8px;
-            margin-top: 6px;
         }
 
         .modal-buttons button {
-            padding: 8px 14px;
+            padding: 7px 12px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Bolha / Ícone Redondo Flutuante para Acesso Rápido -->
-    <div class="floating-bubble" id="floating-bubble" title="Abrir Configurações">⚙️</div>
+    <div class="floating-bubble" id="floating-bubble">⚙️</div>
 
-    <!-- HUD Superior -->
     <div class="top-hud" id="top-hud">
         <h1>Painel Pixel Art</h1>
-        <div id="status">Pronto! Use a bolha flutuante para reabrir este painel a qualquer momento.</div>
+        <div id="status">Pronto! Use a bolha para gerenciar.</div>
         <div class="toolbar">
             <button class="btn-action btn-primary" id="open-add-modal">➕ Adicionar</button>
-            <button class="btn-action" id="open-config-modal">⚙️ Configurações</button>
-            <button class="btn-action btn-edit-mode" id="toggle-edit-mode">✏️ Edição: Desativado</button>
-            <button class="btn-action" id="btn-minimize-overlay" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8;">👁️ Ocultar Painel (Modo Jogo)</button>
+            <button class="btn-action" id="open-config-modal">⚙️ Ajustes</button>
+            <button class="btn-action btn-edit-mode" id="toggle-edit-mode">✏️ Edição: OFF</button>
+            <button class="btn-action" id="btn-minimize-overlay" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8;">👁️ Ocultar</button>
         </div>
     </div>
 
-    <!-- Container Full Screen -->
-    <div class="container" id="button-container">
-        <!-- Botões gerados aparecem aqui -->
-    </div>
+    <div class="container" id="button-container"></div>
 
-    <!-- Área de Teste Flutuante Inferior -->
     <div class="test-area" id="test-area">
         <label for="output-box">Área de Teste</label>
-        <textarea id="output-box" placeholder="Clique nos botões ou aperte as teclas..."></textarea>
+        <textarea id="output-box" placeholder="Toque nos botões..."></textarea>
     </div>
 
     <!-- Modal Adicionar -->
     <div class="modal-overlay" id="add-modal">
         <div class="modal">
-            <h3>Criar Novo Atalho</h3>
+            <h3>Criar Novo Botão</h3>
             <div>
                 <label>Texto do Botão:</label>
                 <input type="text" id="modal-name" placeholder="Ex: W" maxlength="5">
             </div>
             <div>
-                <label>Associar à Tecla:</label>
+                <label>Função / Tecla:</label>
                 <select id="modal-key-select"></select>
             </div>
             <div class="modal-buttons">
@@ -381,25 +359,15 @@
         </div>
     </div>
 
-    <!-- Modal Configurações / Gerenciamento -->
+    <!-- Modal Configurações -->
     <div class="modal-overlay" id="config-modal">
-        <div class="modal" style="max-width: 440px;">
-            <h3>Configurações Globais e dos Botões</h3>
-            
-            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
-                <span style="font-size: 12px; font-weight: 700; color: var(--primary);">⚙️ Configurações Gerais</span>
-                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px;">
-                    <input type="checkbox" id="cfg-global-overlap" style="accent-color: var(--primary);">
-                    <label for="cfg-global-overlap" style="cursor: pointer; color: var(--text); font-size: 12px; margin:0;">Permitir fundir/sobrepor botões</label>
-                </div>
+        <div class="modal" style="max-width: 420px;">
+            <h3>Gerenciar Botões</h3>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; background:var(--bg); padding:8px; border-radius:8px; border:1px solid var(--border);">
+                <input type="checkbox" id="cfg-global-overlap" style="accent-color: var(--primary);">
+                <label for="cfg-global-overlap" style="cursor: pointer; color: var(--text); margin:0;">Permitir sobreposição de botões</label>
             </div>
-
-            <p style="font-size: 12px; color: var(--text-muted); margin: 0;">Lista de botões individuais:</p>
-            
-            <div id="config-list-container" style="max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
-                <!-- Lista injetada via JS -->
-            </div>
-
+            <div id="config-list-container" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
             <div class="modal-buttons">
                 <button id="btn-close-config" class="btn-primary" style="border:none;">Salvar e Fechar</button>
             </div>
@@ -407,6 +375,19 @@
     </div>
 
     <script>
+        // Sistema de Proteção contra travamentos de Storage no WebView
+        let buttonsData = [];
+        let globalSettings = { allowOverlap: true };
+
+        try {
+            const savedBtns = localStorage.getItem('pixel_buttons_v7');
+            if (savedBtns) buttonsData = JSON.parse(savedBtns);
+            const savedGlobals = localStorage.getItem('pixel_globals_v7');
+            if (savedGlobals) globalSettings = JSON.parse(savedGlobals);
+        } catch (e) {
+            console.error("Erro ao carregar dados:", e);
+        }
+
         const container = document.getElementById('button-container');
         const statusDiv = document.getElementById('status');
         const outputBox = document.getElementById('output-box');
@@ -430,38 +411,30 @@
         const cfgGlobalOverlap = document.getElementById('cfg-global-overlap');
 
         let isEditingLayout = false;
-        let buttonsData = JSON.parse(localStorage.getItem('saved_pixel_buttons_fullscreen_v6')) || [];
-        let globalSettings = JSON.parse(localStorage.getItem('saved_pixel_globals_v6')) || { allowOverlap: true };
-
-        let activeDrags = {};
-        let activeResizes = {};
-        let pointerLastHovered = {}; 
-        let toggleIntervals = {}; 
+        let activeDrag = null;
+        let activeResize = null;
         let isOverlayHidden = false;
+        let toggleIntervals = {};
 
-        // Arrastar a Bolha Flutuante pela tela
-        let bubbleDrag = null;
-        floatingBubble.addEventListener('pointerdown', (e) => {
-            bubbleDrag = { startX: e.clientX, startY: e.clientY, posX: floatingBubble.offsetLeft, posY: floatingBubble.offsetTop };
-            floatingBubble.setPointerCapture(e.pointerId);
-            e.stopPropagation();
-        });
+        // Movimentação da Bolha Flutuante (Segura para Toque)
+        let bubbleMove = null;
+        floatingBubble.addEventListener('touchstart', (e) => {
+            const t = e.touches[0];
+            bubbleMove = { startX: t.clientX, startY: t.clientY, posX: floatingBubble.offsetLeft, posY: floatingBubble.offsetTop };
+        }, {passive: true});
 
-        window.addEventListener('pointermove', (e) => {
-            if (bubbleDrag) {
-                const dx = e.clientX - bubbleDrag.startX;
-                const dy = e.clientY - bubbleDrag.startY;
-                floatingBubble.style.left = `${Math.max(0, Math.min(window.innerWidth - 50, bubbleDrag.posX + dx))}px`;
-                floatingBubble.style.top = `${Math.max(0, Math.min(window.innerHeight - 50, bubbleDrag.posY + dy))}px`;
-                floatingBubble.style.right = 'auto';
-            }
-        });
+        window.addEventListener('touchmove', (e) => {
+            if (!bubbleMove) return;
+            const t = e.touches[0];
+            const dx = t.clientX - bubbleMove.startX;
+            const dy = t.clientY - bubbleMove.startY;
+            floatingBubble.style.left = `${Math.max(0, Math.min(window.innerWidth - 50, bubbleMove.posX + dx))}px`;
+            floatingBubble.style.top = `${Math.max(0, Math.min(window.innerHeight - 50, bubbleMove.posY + dy))}px`;
+            floatingBubble.style.right = 'auto';
+        }, {passive: true});
 
-        window.addEventListener('pointerup', (e) => {
-            if (bubbleDrag) bubbleDrag = null;
-        });
+        window.addEventListener('touchend', () => { bubbleMove = null; });
 
-        // Clicar na Bolha reabre o painel
         floatingBubble.addEventListener('click', () => {
             if (isOverlayHidden) {
                 toggleOverlayMode(false);
@@ -471,9 +444,7 @@
             }
         });
 
-        btnMinimizeOverlay.addEventListener('click', () => {
-            toggleOverlayMode(true);
-        });
+        btnMinimizeOverlay.addEventListener('click', () => toggleOverlayMode(true));
 
         function toggleOverlayMode(hide) {
             isOverlayHidden = hide;
@@ -482,72 +453,99 @@
                 testArea.classList.add('hidden-test');
                 configModal.style.display = 'none';
                 addModal.style.display = 'none';
-                if (isEditingLayout) toggleEditModeBtn.click(); // Desativa edição se estiver ativa
-                statusDiv.textContent = 'Modo Flutuante Ativo. Clique na bolha azul para reabrir o painel.';
+                if (isEditingLayout) toggleEditModeBtn.click();
+                statusDiv.textContent = 'Modo Oculto Ativo. Toque na bolha para abrir.';
             } else {
                 topHud.classList.remove('hidden-hud');
                 testArea.classList.remove('hidden-test');
             }
         }
 
-        // Categorias de Teclas
-        const keyCategories = [
-            { group: "Teclas de Função", keys: ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12"] },
-            { group: "Modificadores e Especiais", keys: [
-                { name: "Shift", value: "Shift" }, { name: "Control (Ctrl)", value: "Control" }, { name: "Alt", value: "Alt" },
-                { name: "Enter", value: "Enter" }, { name: "Espaço", value: " " }, { name: "Backspace", value: "Backspace" },
-                { name: "Tab", value: "Tab" }, { name: "Escape (Esc)", value: "Escape" }
-            ]},
-            { group: "Navegação", keys: [
-                { name: "Seta Cima", value: "ArrowUp" }, { name: "Seta Baixo", value: "ArrowDown" },
-                { name: "Seta Esquerda", value: "ArrowLeft" }, { name: "Seta Direita", value: "ArrowRight" },
-                { name: "Delete", value: "Delete" }, { name: "Insert", value: "Insert" }
-            ]},
-            { group: "Letras (A-Z)", keys: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] },
-            { group: "Números (0-9)", keys: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] }
+        // Popular Select de Teclas
+        const keyList = [
+            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+            "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
+            "Shift", "Control", "Alt", "Enter", " ", "Backspace", "Tab", "Escape", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"
         ];
-
-        keyCategories.forEach(cat => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = cat.group;
-            cat.keys.forEach(k => {
-                const option = document.createElement('option');
-                if (typeof k === 'string') {
-                    option.value = k;
-                    option.textContent = k;
-                } else {
-                    option.value = k.value;
-                    option.textContent = k.name;
-                }
-                optgroup.appendChild(option);
-            });
-            modalKeySelect.appendChild(optgroup);
+        keyList.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k;
+            opt.textContent = k === " " ? "Espaço" : k;
+            modalKeySelect.appendChild(opt);
         });
 
         function saveData() {
-            localStorage.setItem('saved_pixel_buttons_fullscreen_v6', JSON.stringify(buttonsData));
-            localStorage.setItem('saved_pixel_globals_v6', JSON.stringify(globalSettings));
-        }
-
-        function checkOverlap(currentIndex, testX, testY, testSize) {
-            if (globalSettings.allowOverlap) return false;
-            for (let i = 0; i < buttonsData.length; i++) {
-                if (i === currentIndex) continue;
-                if (buttonsData[i].enabled === false) continue;
-                const b = buttonsData[i];
-                if (
-                    testX < b.x + b.size &&
-                    testX + testSize > b.x &&
-                    testY < b.y + b.size &&
-                    testY + testSize > b.y
-                ) {
-                    return true;
-                }
+            try {
+                localStorage.setItem('pixel_buttons_v7', JSON.stringify(buttonsData));
+                localStorage.setItem('pixel_globals_v7', JSON.stringify(globalSettings));
+            } catch (e) {
+                console.error("Erro ao salvar:", e);
             }
-            return false;
         }
 
         openAddModalBtn.addEventListener('click', () => {
             modalName.value = '';
             addModal.style.display = 'flex';
+        });
+
+        btnCancelAdd.addEventListener('click', () => { addModal.style.display = 'none'; });
+
+        btnSaveAdd.addEventListener('click', () => {
+            const nameVal = modalName.value.trim();
+            if (!nameVal) {
+                alert('Digite um nome para o botão!');
+                return;
+            }
+            const keyVal = modalKeySelect.value;
+
+            buttonsData.push({
+                name: nameVal,
+                keyVal: keyVal,
+                keyText: keyVal,
+                size: 80,
+                x: Math.round(window.innerWidth / 2 - 40),
+                y: 200 + ((buttonsData.length * 20) % 150),
+                enabled: true,
+                isToggle: false
+            });
+
+            saveData();
+            addModal.style.display = 'none';
+            renderButtons();
+        });
+
+        openConfigModalBtn.addEventListener('click', () => {
+            cfgGlobalOverlap.checked = globalSettings.allowOverlap;
+            buildConfigList();
+            configModal.style.display = 'flex';
+        });
+
+        function buildConfigList() {
+            configListContainer.innerHTML = '';
+            if (buttonsData.length === 0) {
+                configListContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:12px;">Nenhum botão criado.</p>';
+                return;
+            }
+
+            buttonsData.forEach((btn, index) => {
+                const item = document.createElement('div');
+                item.style.cssText = "background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:8px; display:flex; flex-direction:column; gap:6px;";
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11px; font-weight:600; color:var(--primary);">Tecla: ${btn.keyText}</span>
+                        <button class="btn-action" onclick="removeButton(${index})" style="background:rgba(239, 68, 68, 0.2); color:#fca5a5; padding:2px 6px; font-size:10px;">Excluir</button>
+                    </div>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <input type="text" class="cfg-name" data-index="${index}" value="${btn.name}" maxlength="5" style="flex:1; padding:4px; font-size:11px;">
+                    </div>
+                    <div style="display:flex; gap:10px; font-size:11px;">
+                        <label><input type="checkbox" class="cfg-active" data-index="${index}" ${btn.enabled !== false ? 'checked' : ''}> Ativo</label>
+                        <label><input type="checkbox" class="cfg-toggle" data-index="${index}" ${btn.isToggle ? 'checked' : ''}> Travar (Toggle)</label>
+                    </div>
+                `;
+                configListContainer.appendChild(item);
+            });
         }
+
+        window.removeButton = function(i
