@@ -25,15 +25,25 @@ jobs:
       - name: Instalar dependências do projeto
         run: npm install
 
+      - name: Organizar arquivos web para o Capacitor
+        run: |
+          mkdir -p www
+          cp index.html www/
+
       - name: Inicializar o ambiente Android do Capacitor
         run: npx cap add android
 
-      - name: Copiar arquivos web para o projeto nativo
-        run: npx cap copy android
+      - name: Inserir permissão de sobreposição (SYSTEM_ALERT_WINDOW) no Manifesto
+        run: |
+          sed -i '/<application/i \    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />' android/app/src/main/AndroidManifest.xml
+
+      - name: Sincronizar arquivos com o projeto Android
+        run: npx cap sync android
 
       - name: Compilar APK (Gradle Debug)
         run: |
           cd android
+          chmod +x gradlew
           ./gradlew assembleDebug
 
       - name: Salvar o APK gerado
