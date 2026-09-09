@@ -1,588 +1,553 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Starcord</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Painel Pixel Art Overlay</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --surface: rgba(30, 41, 59, 0.90);
+            --surface-hover: #334155;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            box-sizing: border-box;
+            user-select: none;
+            touch-action: none;
+        }
+
+        /* HUD Superior Flutuante */
+        .top-hud {
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            backdrop-filter: blur(8px);
+            padding: 10px 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+            transition: opacity 0.3s ease;
+        }
+
+        .top-hud.hidden-hud {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .top-hud h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        #status {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-action {
+            background-color: var(--surface-hover);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .btn-action:hover {
+            border-color: var(--text-muted);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-edit-mode.active-mode {
+            background-color: #eab308;
+            color: #0f172a;
+            border-color: #ca8a04;
+            font-weight: 700;
+        }
+
+        /* Container Full Screen para os Botões */
+        .container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Botão Personalizado com Multi-toque */
+        .btn-custom {
+            position: absolute;
+            pointer-events: auto;
+            touch-action: none;
+            background-image: url('https://cdn.discordapp.com/attachments/1462160007893356677/1547333184218210347/box_exit.png?ex=6aa309d3&is=6aa1b853&hm=7251647b1dd108a5c9f6059f8c7ac4b3dcf04ffbd65b0d0ba535fd71ab870c94&');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 0px #000000;
+        }
+
+        .container.editing .btn-custom {
+            cursor: move;
+            border: 1px dashed rgba(255, 255, 255, 0.6);
+        }
+
+        .btn-custom.active {
+            background-image: url('https://cdn.discordapp.com/attachments/1462160007893356677/1547333184524386374/box_exit_pressed.png?ex=6aa309d3&is=6aa1b853&hm=16e87166cc798522721e2f97ba52d62a102037cce6beee90df693d24d27d8fe6&');
+        }
+
+        .key-badge {
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            background: var(--primary);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            pointer-events: none;
+        }
+
+        .resize-handle {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            background-color: #38bdf8;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            cursor: nwse-resize;
+            display: none;
+            z-index: 10;
+            touch-action: none;
+        }
+
+        .container.editing .resize-handle {
+            display: block;
+        }
+
+        /* Ícone Redondo Flutuante (Bolha de Acesso Rápido) */
+        .floating-bubble {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            cursor: pointer;
+            z-index: 999;
+            touch-action: none;
+            border: 2px solid rgba(255,255,255,0.3);
+            pointer-events: auto;
+        }
+        .floating-bubble:active {
+            transform: scale(0.95);
+        }
+
+        /* Área de Teste Flutuante Inferior */
+        .test-area {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: var(--surface);
+            backdrop-filter: blur(8px);
+            padding: 12px 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 400px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+            transition: opacity 0.3s ease;
+        }
+        .test-area.hidden-test {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .test-area label {
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--text-muted);
+            align-self: flex-start;
+        }
+
+        .test-area textarea {
+            width: 100%;
+            height: 50px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            resize: none;
+            font-size: 13px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        /* Modal Geral */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: #1e293b;
+            padding: 24px;
+            border-radius: 18px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .modal h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .modal label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .modal input[type="text"], .modal select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            box-sizing: border-box;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .modal-buttons button {
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Tela Splash -->
-  <div id="splashScreen" class="splash-screen">
-    <img id="splashIcon" class="splash-icon" src="icon.png" alt="Carregando..." />
-  </div>
+    <!-- Bolha / Ícone Redondo Flutuante para Acesso Rápido -->
+    <div class="floating-bubble" id="floating-bubble" title="Abrir Configurações">⚙️</div>
 
-  <div class="toast-container" id="toastContainer"></div>
-
-  <!-- Autenticação -->
-  <div id="authScreen" class="auth-screen hidden">
-    <div class="auth-card">
-      <div class="brand-logo">
-        <img src="icon.png" alt="Starcord" />
-      </div>
-      <h2 id="authTitle">Criar Conta</h2>
-      <p id="authSub">Preencha os dados abaixo</p>
-      
-      <div class="input-group" id="groupUsername">
-        <div class="username-input-wrapper">
-          <span class="username-prefix">@</span>
-          <input type="text" id="authUsername" placeholder="Nome de Usuário" autocomplete="off" />
+    <!-- HUD Superior -->
+    <div class="top-hud" id="top-hud">
+        <h1>Painel Pixel Art</h1>
+        <div id="status">Pronto! Use a bolha flutuante para reabrir este painel a qualquer momento.</div>
+        <div class="toolbar">
+            <button class="btn-action btn-primary" id="open-add-modal">➕ Adicionar</button>
+            <button class="btn-action" id="open-config-modal">⚙️ Configurações</button>
+            <button class="btn-action btn-edit-mode" id="toggle-edit-mode">✏️ Edição: Desativado</button>
+            <button class="btn-action" id="btn-minimize-overlay" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8;">👁️ Ocultar Painel (Modo Jogo)</button>
         </div>
-      </div>
-
-      <div class="input-group" id="groupEmail">
-        <input type="email" id="authEmail" placeholder="Seu E-mail" autocomplete="off" />
-      </div>
-
-      <div class="input-group">
-        <input type="password" id="authPassword" placeholder="Crie uma senha" />
-      </div>
-
-      <div class="input-group" id="groupConfirmPassword">
-        <input type="password" id="authConfirmPassword" placeholder="Confirme sua senha" />
-      </div>
-      
-      <button class="btn" id="btnAuthSubmit">Cadastrar</button>
-      <button class="btn btn-secondary" id="btnToggleAuthMode">Já tenho conta!</button>
-      
-      <div id="authError" class="error-msg"></div>
-    </div>
-  </div>
-
-  <!-- Interface Principal -->
-  <div id="appScreen" class="app-container hidden">
-    <div class="sidebar">
-      <div class="user-profile" id="btnOpenSelfProfile" title="Clique para editar seu perfil">
-        <div class="user-info">
-          <div class="user-avatar-main" id="userAvatarMain">U</div>
-          <div class="user-details">
-            <span class="user-display-name" id="userDisplayName">...</span>
-            <span class="user-handle" id="userHandle">@user</span>
-          </div>
-        </div>
-        <div style="display: flex; gap: 4px; align-items: center;">
-          <div class="coins-display" id="coinsDisplay">
-            <span class="coin-icon">⭐</span>
-            <span id="coinsValue">0</span>
-          </div>
-          <button class="btn btn-secondary btn-icon" id="btnOpenStore" title="Loja de Banners">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          </button>
-          <button class="btn btn-secondary btn-icon" id="btnAdminPanel" title="Admin" style="display:none;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-          </button>
-          <button class="btn btn-secondary btn-icon" id="btnLogout" title="Sair">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="add-friend-box">
-        <div class="username-input-wrapper" style="flex: 1;">
-          <span class="username-prefix">@</span>
-          <input type="text" id="friendUsernameInput" placeholder="amigo" autocomplete="off" />
-        </div>
-        <button class="btn btn-icon" id="btnAddFriend" title="Enviar Pedido">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
-        </button>
-      </div>
-
-      <div class="section-header">
-        <span>Servidores</span>
-        <button class="btn btn-secondary btn-icon" id="btnOpenCreateServer" title="Criar Servidor">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
-      </div>
-      <div class="servers-list" id="serversList"></div>
-
-      <div class="section-header">
-        <span>Mensagens</span>
-      </div>
-      <div class="friends-list" id="friendsList"></div>
     </div>
 
-    <!-- Área do Chat -->
-    <div class="chat-area" id="chatArea">
-      <div class="chat-header">
-        <div class="chat-header-left">
-          <button id="btnBack" class="btn btn-secondary btn-icon" title="Voltar">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-          </button>
-          <div class="chat-user-target" id="btnOpenTargetProfile" title="Ver informações">
-            <div class="friend-avatar" id="chatAvatar">A</div>
-            <div class="user-details">
-              <h3 id="chatTargetTitle">@amigo</h3>
-              <span class="user-handle" id="chatTargetHandle">Clique para ver o perfil</span>
+    <!-- Container Full Screen -->
+    <div class="container" id="button-container">
+        <!-- Botões gerados aparecem aqui -->
+    </div>
+
+    <!-- Área de Teste Flutuante Inferior -->
+    <div class="test-area" id="test-area">
+        <label for="output-box">Área de Teste</label>
+        <textarea id="output-box" placeholder="Clique nos botões ou aperte as teclas..."></textarea>
+    </div>
+
+    <!-- Modal Adicionar -->
+    <div class="modal-overlay" id="add-modal">
+        <div class="modal">
+            <h3>Criar Novo Atalho</h3>
+            <div>
+                <label>Texto do Botão:</label>
+                <input type="text" id="modal-name" placeholder="Ex: W" maxlength="5">
             </div>
-          </div>
+            <div>
+                <label>Associar à Tecla:</label>
+                <select id="modal-key-select"></select>
+            </div>
+            <div class="modal-buttons">
+                <button id="btn-cancel-add" style="background:var(--bg); color:var(--text); border:1px solid var(--border);">Cancelar</button>
+                <button id="btn-save-add" class="btn-primary" style="border:none;">Criar</button>
+            </div>
         </div>
-        <button class="btn btn-secondary btn-icon" id="btnServerHeaderInfo" title="Configurações e Convites">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-        </button>
-      </div>
-
-      <div class="chat-messages" id="chatMessages"></div>
-
-      <!-- Indicador de digitação abaixo das mensagens -->
-      <div class="typing-indicator-area" id="typingIndicatorArea">
-        <span class="typing-indicator-text" id="typingIndicatorText"></span>
-      </div>
-
-      <form class="chat-footer" id="chatForm">
-        <label for="fileInput" class="file-btn" title="Anexar arquivo">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57a4 4 0 1 1 5.66 5.66l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-        </label>
-        <input type="file" id="fileInput" />
-        <input type="text" id="messageInput" placeholder="Digite sua mensagem..." autocomplete="off" />
-        <button type="submit" class="btn btn-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
-      </form>
     </div>
-  </div>
 
-  <!-- Modal de Perfil -->
-  <div id="profileModal" class="modal-overlay hidden">
-    <div class="profile-modal">
-      <div class="modal-top-bar">
-        <button class="btn btn-secondary btn-icon" id="btnCloseProfileModal">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <h3 id="profileModalTitle">Perfil</h3>
-        <button class="btn" id="btnSaveProfile">Salvar</button>
-      </div>
+    <!-- Modal Configurações / Gerenciamento -->
+    <div class="modal-overlay" id="config-modal">
+        <div class="modal" style="max-width: 440px;">
+            <h3>Configurações Globais e dos Botões</h3>
+            
+            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
+                <span style="font-size: 12px; font-weight: 700; color: var(--primary);">⚙️ Configurações Gerais</span>
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px;">
+                    <input type="checkbox" id="cfg-global-overlap" style="accent-color: var(--primary);">
+                    <label for="cfg-global-overlap" style="cursor: pointer; color: var(--text); font-size: 12px; margin:0;">Permitir fundir/sobrepor botões</label>
+                </div>
+            </div>
 
-      <div class="profile-banner" id="profileBannerPreview"></div>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 0;">Lista de botões individuais:</p>
+            
+            <div id="config-list-container" style="max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+                <!-- Lista injetada via JS -->
+            </div>
 
-      <div class="profile-avatar-wrapper">
-        <div class="profile-avatar-preview" id="modalAvatarPreview">U</div>
-        <label for="avatarFileInput" class="avatar-edit-overlay" id="modalAvatarEditOverlay" title="Alterar Avatar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        </label>
-        <input type="file" id="avatarFileInput" accept="image/*" />
-      </div>
-
-      <div class="profile-body">
-        <div class="profile-card-section">
-          <div class="field-label">Nome de Exibição</div>
-          <input type="text" id="editDisplayName" placeholder="Ex: Lucas" />
-          <div class="field-value hidden" id="viewDisplayName"></div>
-
-          <div class="field-label">Pronomes</div>
-          <input type="text" id="editPronouns" placeholder="ex: ele/dele" />
-          <div class="field-value hidden" id="viewPronouns"></div>
+            <div class="modal-buttons">
+                <button id="btn-close-config" class="btn-primary" style="border:none;">Salvar e Fechar</button>
+            </div>
         </div>
-
-        <div class="profile-card-section">
-          <div class="field-label">Sobre mim (Bio)</div>
-          <textarea id="editBio" placeholder="Escreva algo sobre você..."></textarea>
-          <div class="field-value hidden" id="viewBio"></div>
-        </div>
-
-        <div class="profile-card-section" id="userRolesSection" style="display:none;">
-          <div class="field-label">Cargos</div>
-          <div id="userRolesList"></div>
-        </div>
-
-        <div class="profile-card-section" id="moderationActions" style="display:none;">
-          <div class="field-label">Moderação</div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn starcord-btn" id="btnKickUser" style="background:#ff6b35;">Expulsar</button>
-            <button class="btn starcord-btn" id="btnBanUser" style="background:#ff1744;">Banir</button>
-            <button class="btn starcord-btn" id="btnAssignRole" style="background:#2979ff;">Dar Cargo</button>
-          </div>
-        </div>
-
-        <div class="profile-card-section" id="giveStarsSection" style="display:none;">
-          <div class="field-label">⭐ Dar Astros para o Servidor</div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;" id="giveStarsContainer"></div>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- Modal Admin Panel -->
-  <div id="adminPanelModal" class="modal-overlay hidden">
-    <div class="profile-modal" style="max-width:500px;">
-      <div class="modal-top-bar">
-        <button class="btn btn-secondary btn-icon" id="btnCloseAdminPanel">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <h3>🛡️ Painel Admin</h3>
-        <div></div>
-      </div>
-      <div class="server-create-body" style="padding:16px;">
-        <p style="color:var(--text-muted);font-size:13px;text-align:center;">Gerencie os itens da loja.</p>
+    <script>
+        const container = document.getElementById('button-container');
+        const statusDiv = document.getElementById('status');
+        const outputBox = document.getElementById('output-box');
+        const topHud = document.getElementById('top-hud');
+        const testArea = document.getElementById('test-area');
+        const floatingBubble = document.getElementById('floating-bubble');
+        const btnMinimizeOverlay = document.getElementById('btn-minimize-overlay');
+
+        const addModal = document.getElementById('add-modal');
+        const configModal = document.getElementById('config-modal');
+        const openAddModalBtn = document.getElementById('open-add-modal');
+        const openConfigModalBtn = document.getElementById('open-config-modal');
+        const toggleEditModeBtn = document.getElementById('toggle-edit-mode');
         
-        <div class="input-group" style="width:100%;">
-          <div class="field-label">Nome do Banner</div>
-          <input type="text" id="adminItemName" placeholder="Ex: Floresta Mística" />
-        </div>
+        const modalName = document.getElementById('modal-name');
+        const modalKeySelect = document.getElementById('modal-key-select');
+        const btnSaveAdd = document.getElementById('btn-save-add');
+        const btnCancelAdd = document.getElementById('btn-cancel-add');
+        const btnCloseConfig = document.getElementById('btn-close-config');
+        const configListContainer = document.getElementById('config-list-container');
+        const cfgGlobalOverlap = document.getElementById('cfg-global-overlap');
 
-        <div class="input-group" style="width:100%;">
-          <div class="field-label">URL da Imagem</div>
-          <input type="text" id="adminItemUrl" placeholder="https://exemplo.com/banner.gif" />
-        </div>
+        let isEditingLayout = false;
+        let buttonsData = JSON.parse(localStorage.getItem('saved_pixel_buttons_fullscreen_v6')) || [];
+        let globalSettings = JSON.parse(localStorage.getItem('saved_pixel_globals_v6')) || { allowOverlap: true };
 
-        <div class="input-group" style="width:100%;">
-          <div class="field-label">Preço (Moedas)</div>
-          <input type="number" id="adminItemPrice" placeholder="100" min="1" />
-        </div>
+        let activeDrags = {};
+        let activeResizes = {};
+        let pointerLastHovered = {}; 
+        let toggleIntervals = {}; 
+        let isOverlayHidden = false;
 
-        <div style="display:flex; gap:8px; width:100%;">
-          <button class="btn" id="btnAdminCreateItem" style="flex:1;">Criar Item</button>
-          <button class="btn btn-secondary" id="btnAdminRefreshItems" style="flex:1;">Atualizar</button>
-        </div>
+        // Arrastar a Bolha Flutuante pela tela
+        let bubbleDrag = null;
+        floatingBubble.addEventListener('pointerdown', (e) => {
+            bubbleDrag = { startX: e.clientX, startY: e.clientY, posX: floatingBubble.offsetLeft, posY: floatingBubble.offsetTop };
+            floatingBubble.setPointerCapture(e.pointerId);
+            e.stopPropagation();
+        });
 
-        <div style="width:100%; height:1px; background:var(--border-color); margin:8px 0;"></div>
+        window.addEventListener('pointermove', (e) => {
+            if (bubbleDrag) {
+                const dx = e.clientX - bubbleDrag.startX;
+                const dy = e.clientY - bubbleDrag.startY;
+                floatingBubble.style.left = `${Math.max(0, Math.min(window.innerWidth - 50, bubbleDrag.posX + dx))}px`;
+                floatingBubble.style.top = `${Math.max(0, Math.min(window.innerHeight - 50, bubbleDrag.posY + dy))}px`;
+                floatingBubble.style.right = 'auto';
+            }
+        });
 
-        <div class="field-label">Itens da Loja</div>
-        <div id="adminItemsList" style="display:flex; flex-direction:column; gap:6px; max-height:300px; overflow-y:auto; width:100%;"></div>
-      </div>
-    </div>
-  </div>
+        window.addEventListener('pointerup', (e) => {
+            if (bubbleDrag) bubbleDrag = null;
+        });
 
-  <!-- Modal da Loja -->
-  <div id="storeModal" class="modal-overlay hidden">
-    <div class="profile-modal" style="max-width:450px;">
-      <div class="modal-top-bar">
-        <button class="btn btn-secondary btn-icon" id="btnCloseStoreModal">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <h3>⭐ Nossa Loja</h3>
-        <div></div>
-      </div>
-      <div class="server-create-body" style="gap:12px; padding:16px;">
-        <p style="color:var(--text-muted);font-size:13px;text-align:center;">Adquira efeitos e banners incríveis!</p>
-        
-        <div style="display:flex; gap:8px; align-items:center; background:var(--bg-card); padding:8px 14px; border-radius:10px; width:100%;">
-          <span style="font-size:13px;">💰 Saldo:</span>
-          <span style="font-weight:700; color:var(--accent-red);" id="storeCoinsBalance">0</span>
-        </div>
+        // Clicar na Bolha reabre o painel
+        floatingBubble.addEventListener('click', () => {
+            if (isOverlayHidden) {
+                toggleOverlayMode(false);
+            } else {
+                buildConfigList();
+                configModal.style.display = 'flex';
+            }
+        });
 
-        <div id="storeItemsContainer" style="width:100%; display:flex; flex-direction:column; gap:10px; max-height:400px; overflow-y:auto; padding-right:4px;"></div>
-      </div>
-    </div>
-  </div>
+        btnMinimizeOverlay.addEventListener('click', () => {
+            toggleOverlayMode(true);
+        });
 
-  <!-- Modal de Criar Servidor -->
-  <div id="createServerModal" class="modal-overlay hidden">
-    <div class="profile-modal">
-      <div class="modal-top-bar">
-        <button class="btn btn-secondary btn-icon" id="btnCloseCreateServer">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <h3>Criar seu servidor</h3>
-        <div></div>
-      </div>
-      <div class="server-create-body">
-        <p style="color:var(--text-muted);font-size:13px;text-align:center;">Seu servidor é onde você e seus amigos se reúnem.</p>
-        
-        <label class="server-icon-picker" id="serverIconPickerLabel">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          <span>ENVIAR</span>
-          <input type="file" id="serverAvatarFileInput" accept="image/*" />
-        </label>
+        function toggleOverlayMode(hide) {
+            isOverlayHidden = hide;
+            if (hide) {
+                topHud.classList.add('hidden-hud');
+                testArea.classList.add('hidden-test');
+                configModal.style.display = 'none';
+                addModal.style.display = 'none';
+                if (isEditingLayout) toggleEditModeBtn.click(); // Desativa edição se estiver ativa
+                statusDiv.textContent = 'Modo Flutuante Ativo. Clique na bolha azul para reabrir o painel.';
+            } else {
+                topHud.classList.remove('hidden-hud');
+                testArea.classList.remove('hidden-test');
+            }
+        }
 
-        <div class="input-group" style="width:100%;">
-          <div class="field-label">Nome do servidor</div>
-          <input type="text" id="inputServerName" placeholder="Nome do servidor" />
-        </div>
+        // Categorias de Teclas
+        const keyCategories = [
+            { group: "Teclas de Função", keys: ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12"] },
+            { group: "Modificadores e Especiais", keys: [
+                { name: "Shift", value: "Shift" }, { name: "Control (Ctrl)", value: "Control" }, { name: "Alt", value: "Alt" },
+                { name: "Enter", value: "Enter" }, { name: "Espaço", value: " " }, { name: "Backspace", value: "Backspace" },
+                { name: "Tab", value: "Tab" }, { name: "Escape (Esc)", value: "Escape" }
+            ]},
+            { group: "Navegação", keys: [
+                { name: "Seta Cima", value: "ArrowUp" }, { name: "Seta Baixo", value: "ArrowDown" },
+                { name: "Seta Esquerda", value: "ArrowLeft" }, { name: "Seta Direita", value: "ArrowRight" },
+                { name: "Delete", value: "Delete" }, { name: "Insert", value: "Insert" }
+            ]},
+            { group: "Letras (A-Z)", keys: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] },
+            { group: "Números (0-9)", keys: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] }
+        ];
 
-        <div class="input-group" style="width:100%;">
-          <div class="field-label">Descrição</div>
-          <textarea id="inputServerDesc" placeholder="Sobre o que é este servidor?"></textarea>
-        </div>
+        keyCategories.forEach(cat => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = cat.group;
+            cat.keys.forEach(k => {
+                const option = document.createElement('option');
+                if (typeof k === 'string') {
+                    option.value = k;
+                    option.textContent = k;
+                } else {
+                    option.value = k.value;
+                    option.textContent = k.name;
+                }
+                optgroup.appendChild(option);
+            });
+            modalKeySelect.appendChild(optgroup);
+        });
 
-        <div class="input-group" style="width:100%;">
-          <div class="field-label">Cor do Banner</div>
-          <div class="color-picker-trigger-box" id="btnTriggerColorCreate">
-            <div class="color-preview-swatch" id="previewColorCreate" style="background:#000000;"></div>
-            <span id="txtColorCreate" style="font-family:monospace;font-weight:600;font-size:13px;">#000000</span>
-            <span style="font-size:11px;color:var(--accent-red);margin-left:auto;font-weight:700;">SELECIONAR</span>
-          </div>
-        </div>
+        function saveData() {
+            localStorage.setItem('saved_pixel_buttons_fullscreen_v6', JSON.stringify(buttonsData));
+            localStorage.setItem('saved_pixel_globals_v6', JSON.stringify(globalSettings));
+        }
 
-        <button class="btn" id="btnConfirmCreateServer" style="width:100%;">Criar Servidor</button>
-      </div>
-    </div>
-  </div>
+        function checkOverlap(currentIndex, testX, testY, testSize) {
+            if (globalSettings.allowOverlap) return false;
+            for (let i = 0; i < buttonsData.length; i++) {
+                if (i === currentIndex) continue;
+                if (buttonsData[i].enabled === false) continue;
+                const b = buttonsData[i];
+                if (
+                    testX < b.x + b.size &&
+                    testX + testSize > b.x &&
+                    testY < b.y + b.size &&
+                    testY + testSize > b.y
+                ) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
-  <!-- Modal de Convidar Amigos -->
-  <div id="inviteFriendsModal" class="modal-overlay hidden">
-    <div class="profile-modal">
-      <div class="modal-top-bar">
-        <button class="btn btn-secondary btn-icon" id="btnCloseInviteModal">Pular</button>
-        <h3>Adicione algumas pessoas</h3>
-        <div></div>
-      </div>
-      <div class="server-create-body">
-        <p style="color:var(--text-muted);font-size:13px;text-align:center;">Convide amigos para entrar no servidor.</p>
-        
-        <div class="invite-link-box">
-          <span id="txtInviteLink" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">starcord.gg/xyz</span>
-          <button class="btn" id="btnCopyInviteLink" style="padding:6px 12px;font-size:11px;">Copiar</button>
-        </div>
-
-        <div class="field-label" style="align-self:flex-start;margin-top:8px;">Convide seus amigos</div>
-        <div class="invite-friends-list" id="inviteFriendsListContainer"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal de Informações do Servidor -->
-  <div id="serverInfoModal" class="modal-overlay hidden">
-    <div class="profile-modal" style="max-width:500px;">
-      <div class="modal-top-bar">
-        <button class="btn btn-secondary btn-icon" id="btnCloseServerInfoModal">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <h3 id="serverInfoModalTitle">Informações</h3>
-        <button class="btn hidden" id="btnSaveServerEdit">Salvar</button>
-      </div>
-      <div class="profile-body">
-        <div style="display:flex; align-items:center; gap:14px;">
-          <div class="server-avatar" id="serverInfoModalAvatar" style="width:60px;height:60px;border-radius:50%;font-size:20px;">S</div>
-          <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
-            <input type="text" id="editServerNameInput" class="hidden" placeholder="Nome" />
-            <h4 id="serverInfoName" style="font-size:16px;font-weight:700;">Servidor</h4>
-            <span id="serverInfoOwner" style="font-size:12px;color:var(--accent-red);">Dono: @...</span>
-          </div>
-        </div>
-
-        <!-- Nível do Servidor -->
-        <div class="profile-card-section">
-          <div class="field-label">⭐ Nível do Servidor</div>
-          <div id="serverLevelDisplay" style="display:flex; flex-direction:column; gap:6px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span id="serverLevelText" style="font-weight:700; font-size:14px;">Level 1</span>
-              <span id="serverStarsCount" style="font-size:12px;color:var(--text-muted);">0 Astros</span>
-            </div>
-            <div class="level-progress-bar" id="levelProgressBar">
-              <div class="level-progress-fill" id="levelProgressFill" style="width:0%;"></div>
-            </div>
-            <span id="levelProgressText" style="font-size:11px;color:var(--text-muted);">0 / 3 Astros para Level 2</span>
-          </div>
-          <div style="margin-top:6px;font-size:11px;color:var(--text-muted);">
-            <span>Benefícios do Level <span id="levelBenefitsText">1</span>:</span>
-            <span id="levelBenefitsList" style="display:block;margin-top:2px;">📌 Banner Personalizado</span>
-          </div>
-        </div>
-
-        <div class="profile-card-section hidden" id="editBannerColorSection">
-          <div class="field-label">Cor do Banner</div>
-          <div class="color-picker-trigger-box" id="btnTriggerColorEdit">
-            <div class="color-preview-swatch" id="previewColorEdit" style="background:#000000;"></div>
-            <span id="txtColorEdit" style="font-family:monospace;font-weight:600;font-size:13px;">#000000</span>
-            <span style="font-size:11px;color:var(--accent-red);margin-left:auto;font-weight:700;">SELECIONAR</span>
-          </div>
-        </div>
-
-        <div class="profile-card-section">
-          <div class="field-label">Link de Convite</div>
-          <div class="invite-link-box">
-            <span id="modalServerInviteLink">starcord.gg/...</span>
-            <button class="btn" id="btnModalCopyLink" style="padding:6px 10px;font-size:11px;">Copiar</button>
-          </div>
-        </div>
-
-        <div class="profile-card-section">
-          <div class="field-label">Descrição</div>
-          <p class="field-value" id="serverInfoDescText">Sem descrição.</p>
-          <textarea id="editServerDescInput" class="hidden" placeholder="Descrição..."></textarea>
-        </div>
-
-        <div class="profile-card-section" id="rolesSection">
-          <div class="field-label" style="display:flex; justify-content:space-between; align-items:center;">
-            <span>Cargos</span>
-            <button class="btn" id="btnCreateRole" style="padding:4px 12px;font-size:11px;">+ Criar</button>
-          </div>
-          <div id="serverRolesList" style="display:flex; flex-direction:column; gap:4px; margin-top:4px;"></div>
-        </div>
-
-        <div class="profile-card-section" id="serverMembersSection">
-          <div class="field-label">Membros</div>
-          <div id="serverMembersListContainer" style="display:flex; flex-direction:column; gap:6px; margin-top:6px;"></div>
-        </div>
-
-        <div style="display:flex; gap:10px; margin-top:10px;">
-          <button class="btn btn-secondary" id="btnOpenInviteMore" style="flex:1;">Convidar</button>
-          <button class="btn" id="btnLeaveOrDeleteServer" style="background:#ff4d4d; flex:1;">Sair</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal de Criação/Edição de Cargo -->
-  <div id="roleModal" class="modal-overlay hidden">
-    <div class="profile-modal" style="max-width:420px;">
-      <div class="modal-top-bar">
-        <button class="btn btn-secondary btn-icon" id="btnCloseRoleModal">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <h3 id="roleModalTitle">Criar Cargo</h3>
-        <button class="btn" id="btnSaveRole">Salvar</button>
-      </div>
-      <div class="server-create-body" style="padding:20px;">
-        <div class="input-group" style="width:100%;">
-          <div class="field-label">Nome do Cargo</div>
-          <input type="text" id="inputRoleName" placeholder="Ex: Moderador" />
-        </div>
-
-        <div class="input-group" style="width:100%;">
-          <div class="field-label">Cor do Cargo</div>
-          <div class="color-picker-trigger-box" id="btnTriggerColorRole">
-            <div class="color-preview-swatch" id="previewColorRole" style="background:#ffffff;"></div>
-            <span id="txtColorRole" style="font-family:monospace;font-weight:600;font-size:13px;">#ffffff</span>
-            <span style="font-size:11px;color:var(--accent-red);margin-left:auto;font-weight:700;">SELECIONAR</span>
-          </div>
-        </div>
-
-        <div class="input-group" style="width:100%;">
-          <div class="field-label">Permissões</div>
-          <div style="display:flex; flex-direction:column; gap:8px; background:var(--bg-card); padding:12px; border-radius:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px;">Enviar Mensagem</span>
-              <label class="toggle-switch"><input type="checkbox" id="permSendMessage" checked /><span class="toggle-slider"></span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px;">Mencionar Cargos</span>
-              <label class="toggle-switch"><input type="checkbox" id="permMentionRoles" /><span class="toggle-slider"></span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px;">Editor de Textos (#, ##, ###)</span>
-              <label class="toggle-switch"><input type="checkbox" id="permTextEditor" /><span class="toggle-slider"></span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px;">Gerenciar Cargos</span>
-              <label class="toggle-switch"><input type="checkbox" id="permManageRoles" /><span class="toggle-slider"></span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px;">Expulsar Membros</span>
-              <label class="toggle-switch"><input type="checkbox" id="permKick" /><span class="toggle-slider"></span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px;">Banir Membros</span>
-              <label class="toggle-switch"><input type="checkbox" id="permBan" /><span class="toggle-slider"></span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px;">Excluir Mensagens (todas)</span>
-              <label class="toggle-switch"><input type="checkbox" id="permDeleteAll" /><span class="toggle-slider"></span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px;">Excluir Própria Mensagem</span>
-              <label class="toggle-switch"><input type="checkbox" id="permDeleteOwn" checked /><span class="toggle-slider"></span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px;">Enviar Imagem</span>
-              <label class="toggle-switch"><input type="checkbox" id="permSendImage" checked /><span class="toggle-slider"></span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px;">Responder Mensagens</span>
-              <label class="toggle-switch"><input type="checkbox" id="permReply" checked /><span class="toggle-slider"></span></label>
-            </div>
-          </div>
-        </div>
-
-        <button class="btn" id="btnDeleteRole" style="background:#ff1744; width:100%; display:none;">Excluir Cargo</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal de Atribuir Cargo -->
-  <div id="assignRoleModal" class="modal-overlay hidden">
-    <div class="profile-modal" style="max-width:380px;">
-      <div class="modal-top-bar">
-        <button class="btn btn-secondary btn-icon" id="btnCloseAssignRoleModal">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <h3>Atribuir Cargo</h3>
-        <div></div>
-      </div>
-      <div class="server-create-body" style="padding:20px;">
-        <p style="color:var(--text-muted);font-size:13px;text-align:center;">Selecione um cargo para atribuir.</p>
-        <div id="assignRoleList" style="width:100%; display:flex; flex-direction:column; gap:6px;"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tooltip de Reações -->
-  <div id="reactionTooltip" class="reaction-tooltip hidden">
-    <div class="reaction-tooltip-content" id="reactionTooltipContent">
-      <button class="reaction-emoji" data-emoji="😀">😀</button>
-      <button class="reaction-emoji" data-emoji="😃">😃</button>
-      <button class="reaction-emoji" data-emoji="😄">😄</button>
-      <button class="reaction-emoji" data-emoji="😁">😁</button>
-      <button class="reaction-emoji" data-emoji="😆">😆</button>
-      <button class="reaction-emoji" data-emoji="😅">😅</button>
-      <button class="reaction-emoji" data-emoji="🤣">🤣</button>
-      <button class="reaction-emoji" data-emoji="😂">😂</button>
-      <button class="reaction-emoji" data-emoji="🤩">🤩</button>
-      <button class="reaction-emoji" data-emoji="😘">😘</button>
-      <button class="reaction-emoji" data-emoji="😗">😗</button>
-      <button class="reaction-emoji" data-emoji="☺️">☺️</button>
-      <button class="reaction-emoji" data-emoji="😚">😚</button>
-      <button class="reaction-emoji" data-emoji="😙">😙</button>
-      <button class="reaction-emoji" data-emoji="🥲">🥲</button>
-    </div>
-  </div>
-
-  <!-- Tooltip de Resposta -->
-  <div id="replyTooltip" class="reply-tooltip hidden">
-    <div class="reply-tooltip-content">
-      <button id="btnReplyMessage" class="btn starcord-btn" style="background:#2979ff;">Responder</button>
-      <button id="btnCopyMessage" class="btn starcord-btn" style="background:#555;">Copiar</button>
-      <button id="btnDeleteMessage" class="btn starcord-btn" style="background:#ff1744;display:none;">Excluir</button>
-    </div>
-  </div>
-
-  <!-- Modal do Seletor de Cores -->
-  <div id="customColorPickerModal" class="color-picker-modal hidden">
-    <div class="color-picker-card">
-      <div class="color-picker-header">
-        <h3>Selecione uma cor</h3>
-        <button class="color-picker-select-btn" id="btnSelectColor">Selecionar</button>
-      </div>
-      <input type="text" id="pickerHexInput" class="color-picker-hex-input" value="#000000" autocomplete="off" spellcheck="false" />
-      <div class="color-picker-sat-box" id="pickerSatBox">
-        <div class="color-picker-sat-bg" id="pickerSatBg"></div>
-        <div class="color-picker-sat-white"></div>
-        <div class="color-picker-sat-black"></div>
-        <div class="color-picker-sat-pointer" id="pickerSatPointer"></div>
-      </div>
-      <div class="color-picker-hue-bar" id="pickerHueBar">
-        <div class="color-picker-hue-thumb" id="pickerHueThumb"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal de Ajuste/Corte de Avatar -->
-  <div id="cropModal" class="modal-overlay hidden">
-    <div class="crop-modal-content">
-      <div style="font-size:14px;font-weight:700;width:100%;text-align:center;">Editar imagem</div>
-      <div class="crop-viewport-container" id="cropContainer">
-        <canvas id="cropCanvas" width="260" height="260"></canvas>
-        <div class="crop-grid-overlay">
-          <div></div><div></div><div></div>
-          <div></div><div></div><div></div>
-          <div></div><div></div><div></div>
-        </div>
-      </div>
-      <div class="crop-controls">
-        <div class="crop-slider-label"><span>Zoom</span><span id="zoomVal">100%</span></div>
-        <input type="range" id="cropZoom" min="100" max="500" value="100" />
-      </div>
-      <div class="crop-actions">
-        <button class="btn btn-secondary" id="btnCancelCrop" style="flex:1;">Cancelar</button>
-        <button class="btn" id="btnApplyCrop" style="flex:1;">Confirmar</button>
-      </div>
-    </div>
-  </div>
-
-  <script type="module" src="script.js"></script>
-</body>
-</html>
+        openAddModalBtn.addEventListener('click', () => {
+            modalName.value = '';
+            addModal.style.display = 'flex';
+        }
